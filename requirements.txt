@@ -1,0 +1,6 @@
+numpy
+random
+scipy
+matplotlib
+sklearn >= 0.17
+cv2 >= 3.1
