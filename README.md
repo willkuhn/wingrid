@@ -42,6 +42,7 @@ pip install --upgrade pandas
 ```
 
 ## Installing
+Clone the git repository to a local directory, go to that directory, and install:
 ```sh
 git clone https://github.com/willkuhn/wingrid.git
 cd wingrid
