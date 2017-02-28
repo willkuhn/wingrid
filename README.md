@@ -42,12 +42,19 @@ pip install --upgrade pandas
 ```
 
 ## Installing
-Clone the git repository to a local directory, go to that directory, and run `setup.py`:
 ```sh
 git clone https://github.com/willkuhn/wingrid.git
 cd wingrid
-python setup.py
+python setup.py install
 ```
+
+Now you can test that wingrid was sucessfully installed in Python:
+```python
+>>> import wingrid
+>>> wingrid.__version__
+'0.1.0'
+```
+
 
 ## Image Preparation
 wingrid works with scanned images of insect wings, prepared with the following guidelines. See this project's `images` folder for examples.
@@ -120,6 +127,7 @@ Here is the resulting plot: the original image in chromatic coordinates, with th
 
 
 ## Sample color features
+
 **Sample a single image:**
 ```python
 >>> fn = '681.png'
@@ -203,6 +211,8 @@ This is an example of some pandas and os functionality that's useful to know whe
 >>> labels = md['label']
 
 # Make the plot
+>>> title = '{} non-edge cells ({} features)'.format(an.n_features_masked_/6,
+>>>                                                  an.n_features_masked_)
 >>> an.plot_comps(labels,comps=[1,2],indiv_labels=None,title=title)
 ```
 
@@ -355,10 +365,9 @@ Structural:
 - [ ] add an overarching class that manages sampling multiple images and analysis of these data
 
 Visual:
-- [ ] fix labeling in `Analyze.loadings_plot_bar`
-- [ ] change color of grid in grid-plotting functions to this nice blue (0,95,254) and find a better color for grid cell numbers
+- [ ] fix y-axis labeling in `Analyze.loadings_plot_bar`, and possibly make the plot horizontal instead of vertical
+- [ ] find a better color for grid cell numbers in grid-plotting functions
 - [ ] in grid-plotting functions, reduce text size when plotting grid cell numbers on small cells (so numbers don't overlap)
-- [ ] make colors & text more uniform across plotting functions
 - [ ] add option in plotting functions to save directly to a provided filepath
 - [ ] add option for customizing coloring of plot elements
 - [ ] in `Analyze.fit_pca` and `Analyze.fit_lda` allow `**kwargs` to the sklearn functions that they wrap

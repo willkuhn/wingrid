@@ -687,10 +687,10 @@ class Grid():
         background  = self.background
 
         # Set up plot colors
-        colors = [(  0,  38, 153), # for triangle, darker blue
-                  (  0,  64, 255), # for triangle vertices, lighter blue
-                  (  0, 102,   0), # for grid lines, darker green
-                  (  0, 255,   0), # for grid cell numbers, lighter green
+        colors = [(103, 255,  30), # for triangle
+                  (103, 255,  30), # for triangle vertices
+                  (  0,  95, 254), # for grid lines
+                  (240,  59,   0), # for grid cell numbers
                   (191, 191, 191), # for edge cells, gray
                   ]
 
@@ -828,6 +828,13 @@ class Grid():
                    radii[-1]*np.sin(np.deg2rad(thetas[-1]))+A[1]+buf)
         ax.set_xlim(xmin,xmax)
         ax.set_ylim(ymin,ymax)
+
+        # adjust plot padding
+        plt.subplots_adjust(bottom=0.06,
+                            left=  0.06,
+                            right= 0.96,
+                            top=   0.96
+                            )
 
         plt.show()
 
@@ -1311,11 +1318,8 @@ class Analyze():
             plot_title += (' - '+title)
         plt.title(plot_title,fontsize=16,weight='bold')
 
-        # remove space between subplots
-        plt.subplots_adjust(hspace=0.001,
-                            wspace=0.001,
-                            # padding on sides
-                            bottom=0.06,
+        # adjust plot padding
+        plt.subplots_adjust(bottom=0.06,
                             left=  0.06,
                             right= 0.96,
                             top=   0.96
@@ -1408,11 +1412,18 @@ class Analyze():
         # Change color of the background outside plot to white
         ax.set_axis_bgcolor('white')
 
-        # TODO: Space bars out more so labels can be read easier when there are many features        plt.show()
+        # adjust plot padding
+        plt.subplots_adjust(bottom=0.06,
+                            #left=  0.06,
+                            #right= 0.96,
+                            top=   0.96
+                            )
+
+        plt.show()
 
 
     def loadings_plot_2d(self,grid,comps=[1,2],n_highest=10):
-        """TODO: Scatterplot that shows, in 2 dimensions, the contribution that
+        """Scatterplot that shows, in 2 dimensions, the contribution that
         each feature makes toward the selected components. Thus, points that
         are relatively far away from the origin represent high contributing-
         features. The top `n_highest` contributing features are highlighted
@@ -1561,6 +1572,13 @@ class Analyze():
 
         # TODO: add colorbar (use code from `loadings_image_overlay`)
 
+        # adjust plot padding
+        plt.subplots_adjust(bottom=0.08,
+                            left=  0.08,
+                            right= 0.96,
+                            top=   0.96
+                            )
+
         plt.show()
 
 
@@ -1668,7 +1686,10 @@ class Analyze():
 
         # PRE-PLOT
         # Set up plot colors
-        colors = [(  0, 102,   0), # for grid lines, darker green
+        colors = [(103, 255,  30), # for triangle
+                  (103, 255,  30), # for triangle vertices
+                  (  0,  95, 254), # for grid lines
+                  (240,  59,   0), # for grid cell numbers
                   (191, 191, 191), # for edge cells, gray
                   ]
 
@@ -1749,7 +1770,7 @@ class Analyze():
                               width=radii[c+1]-radii[c]) # outer - inner radius
                     patches.append(w)
                 p = PatchCollection(patches,
-                                    facecolor=colors[1],
+                                    facecolor=colors[4],
                                     edgecolor=None,
                                     alpha=0.5)
                 ax.add_collection(p)
@@ -1764,7 +1785,9 @@ class Analyze():
             for r in radii:
                 w = Wedge(A,r,thetas[0],thetas[-1], width=0.001)
                 patches.append(w)
-            p = PatchCollection(patches,facecolor='none',edgecolor='c',
+            p = PatchCollection(patches,
+                                facecolor='none',
+                                edgecolor=colors[2],
                                 lw=glw)
             ax.add_collection(p)
 
@@ -1774,7 +1797,9 @@ class Analyze():
                 y0 = (radii[0] * np.sin(t)) + A[1]
                 x1 = (radii[-1] * np.cos(t)) + A[0]
                 y1 = (radii[-1] * np.sin(t)) + A[1]
-                line = lines.Line2D((x0,x1),(y0,y1),color='c', lw=glw)
+                line = lines.Line2D((x0,x1),(y0,y1),
+                                    color=colors[2],
+                                    lw=glw)
                 ax.add_line(line)
 
             # Annotate cells with their cell number
@@ -1849,6 +1874,7 @@ class Analyze():
                     elif st==1:
                         ax.text(-25,2,'stdev',rotation='vertical',fontsize=14,weight='bold',ha='right')
 
+        # adjust plot padding and spacing between plots
         plt.subplots_adjust(hspace=0.001,
                             wspace=0.001,
                             # padding on sides
