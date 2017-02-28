@@ -351,15 +351,15 @@ I'd love to have your help making this project better! Thanks in advance! You ca
 Here's a semi-prioritized list of improvement ideas...
 
 Structural:
-- [] optimize grid sampling to speed it up, specifically `Grid._get_px_coords_for_cell` and `Grid._sample_grid`
-- [] add an overarching class that manages sampling multiple images and analysis of these data
+- [ ] optimize grid sampling to speed it up, specifically `Grid._get_px_coords_for_cell` and `Grid._sample_grid`
+- [ ] add an overarching class that manages sampling multiple images and analysis of these data
 
 Visual:
-- [] fix labeling in `Analyze.loadings_plot_bar`
-- [] change color of grid in grid-plotting functions to this nice blue (0,95,254) and find a better color for grid cell numbers
-- [] in grid-plotting functions, reduce text size when plotting grid cell numbers on small cells (so numbers don't overlap)
-- [] make colors & text more uniform across plotting functions
-- [] add option in plotting functions to save directly to a provided filepath
-- [] add option for customizing coloring of plot elements
-- [] in `Analyze.fit_pca` and `Analyze.fit_lda` allow `**kwargs` to the sklearn functions that they wrap
-- [] make all functions work better with Pandas, especially plotting functions (like [seaborn does](http://seaborn.pydata.org/tutorial/axis_grids.html))
+- [ ] fix labeling in `Analyze.loadings_plot_bar`
+- [ ] change color of grid in grid-plotting functions to this nice blue (0,95,254) and find a better color for grid cell numbers
+- [ ] in grid-plotting functions, reduce text size when plotting grid cell numbers on small cells (so numbers don't overlap)
+- [ ] make colors & text more uniform across plotting functions
+- [ ] add option in plotting functions to save directly to a provided filepath
+- [ ] add option for customizing coloring of plot elements
+- [ ] in `Analyze.fit_pca` and `Analyze.fit_lda` allow `**kwargs` to the sklearn functions that they wrap
+- [ ] make all functions work better with Pandas, especially plotting functions (like [seaborn does](http://seaborn.pydata.org/tutorial/axis_grids.html))
