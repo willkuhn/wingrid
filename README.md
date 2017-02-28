@@ -6,7 +6,7 @@ wingrid is a small Python package for quantifying and comparing "appearance" of 
 - [**Getting Started**](#getting-started)
 - [**Usage**](#usage)
 - [**Description**](#description)
-- [**Acknowledgements & References**](#acknowledgements-references)
+- [**Acknowledgements & References**](#acknowledgements--references)
 - [**Author**](#author)
 - [**License**](#license)
 - [**How to Cite**](#how-to-cite)
