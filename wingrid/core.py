@@ -753,7 +753,7 @@ class Grid():
                 p = PatchCollection(patches,
                                     facecolor=colors[4],
                                     edgecolor=None,
-                                    alpha=0.1)
+                                    alpha=0.2)
                 ax.add_collection(p)
 
         # Plot triangle
@@ -975,6 +975,7 @@ class Analyze():
         self.explained_variance_ratio_ = pca.explained_variance_ratio_
         self.method_                   = 'pca'
 
+        return self
 
     def fit_lda(self,labels):
         """Perform a linear discriminant analysis (LDA) on the features.
@@ -982,8 +983,8 @@ class Analyze():
         Parameters
         ----------
         labels : array, shape (n_samples,)
-            Target values
-
+            Target values, i.e. a variable that groups samples into some
+            arbitrary subsets.
         """
         if self.f_mask is not None:
             X = self.features_masked_
@@ -1006,6 +1007,7 @@ class Analyze():
         self.classes_                  = np.unique(labels)
         self.method_                   = 'lda'
 
+        return self
 
     def loadings_top_contrib(self,comps=[1],n_highest=-1,grid=None):
         """Get the top-contributing features for 1+ components.
@@ -1323,7 +1325,7 @@ class Analyze():
 
 
     def loadings_plot_bar(self,grid,comp=1):
-        """Draw bar plot of loadings for a linear discriminant.
+        """Draw bar plot of loadings for a component of transformed features.
 
         Parameters
         ----------
@@ -1366,21 +1368,21 @@ class Analyze():
             f_labels = f_labels[f_mask_common]
 
         # Get variance for specified component
-        var = explained_variance_ratio[comp]
+        var = explained_variance_ratio[comp-1]
 
         # Set up plot and subplots
         fig,ax = plt.subplots(nrows=1,ncols=1,facecolor='w',figsize=(3,12))
 
         # Plot loadings for each PC as a separate bar plot:
         ax.barh(bottom=range(len(loadings[0])), # y-value for each bar
-                width=loadings[comp],        # length of each bar
+                width=loadings[comp-1],        # length of each bar
                 height=0.6,                  # how wide to make each bar
                 color='k',
                 linewidth=0)
 
         # Set axis limits
-        xmin = loadings[comp].min()-0.1*loadings[comp].std()
-        xmax = loadings[comp].max()+0.1*loadings[comp].std()
+        xmin = loadings[comp-1].min()-0.1*loadings[comp-1].std()
+        xmax = loadings[comp-1].max()+0.1*loadings[comp-1].std()
         ax.set_xlim(xmin,xmax)
         ax.set_ylim(-2,loadings.shape[1]+2) # add a little space above 1st bar and below last bar
 
@@ -1415,6 +1417,11 @@ class Analyze():
         are relatively far away from the origin represent high contributing-
         features. The top `n_highest` contributing features are highlighted
         and labeled.
+
+        This plot is adapted from one in Valentine Svensson's 29 November 2012
+        blog post entitled, "Loadings with scikit-learn PCA"
+        (http://www.nxn.se/valent/loadings-with-scikit-learn-pca and
+        https://gist.github.com/vals/4172579).
 
         Parameters
         ----------
@@ -1552,12 +1559,18 @@ class Analyze():
         # Change color of the background outside plot to white
         ax.set_axis_bgcolor('white')
 
+        # TODO: add colorbar (use code from `loadings_image_overlay`)
+
         plt.show()
 
 
     def loadings_image_overlay(self,image,grid,comps=[1],show_cell_nums=False,
                                use_chrom=True,title=None):
-        """
+        """Visualize the loadings of all features on a grid-fitted image.
+
+        This produces a 2x3 plot, where columns represent color channels (rgb),
+        rows represent statistic (mean or stdev), and each subplot shows the
+        fitted grid plotted on the appropriate channel of `image`.
 
         Parameters
         ----------
@@ -1832,9 +1845,9 @@ class Analyze():
                     ax.text(3,1,channel,color=channel,fontsize=14,weight='bold',ha='left')
                 if channel=='red':
                     if st==0:
-                        ax.text(-2,2,'mean',rotation='vertical',fontsize=14,weight='bold',ha='right')
+                        ax.text(-25,2,'mean',rotation='vertical',fontsize=14,weight='bold',ha='right')
                     elif st==1:
-                        ax.text(-2,2,'stdev',rotation='vertical',fontsize=14,weight='bold',ha='right')
+                        ax.text(-25,2,'stdev',rotation='vertical',fontsize=14,weight='bold',ha='right')
 
         plt.subplots_adjust(hspace=0.001,
                             wspace=0.001,

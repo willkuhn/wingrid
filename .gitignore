@@ -118,3 +118,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Private folders
+private/
+temp/

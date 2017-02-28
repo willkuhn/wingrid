@@ -4,14 +4,14 @@ wingrid Insect Wing Color Analysis Package (:mod: `wingrid`)
 ============================================================
 
 Wingrid for Python is a package for:
-  (1) fitting a stretchable grid to images of insect wings,
+  (1) fitting a deformable grid to images of insect wings,
   (2) sampling color features from grid-fitted images, and
   (3) analyzing and visualizing color features sampled from images.
 """
 
 # Author: William R. Kuhn
 
-# License: MIT License
+# License: GNU GPL License v3
 
 from .core import *
 from .helpers import *
