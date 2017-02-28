@@ -52,15 +52,15 @@ python setup.py
 ## Image Preparation
 wingrid works with scanned images of insect wings, prepared with the following guidelines. See this project's `images` folder for examples.
 
-1) Image composition: Each image should contain a single pair of wings (a fore- and hindwing), which have been separated from the body before imaging (or the body should be cropped out). Wings should be right-facing (so that the cut sides are on the left, tips on the right), both facing dorsally or ventrally, and should be either very close together, touching or overlapping (we set butterfly wings in a 'natural' where they were slightly overlapping). The wings should be free from dust and debris.
+1. **Image composition:** Each image should contain a single pair of wings (a fore- and hindwing), which have been separated from the body before imaging (or the body should be cropped out). Wings should be right-facing (so that the cut sides are on the left, tips on the right), both facing dorsally or ventrally, and should be either very close together, touching or overlapping (we set butterfly wings in a 'natural' where they were slightly overlapping). The wings should be free from dust and debris.
 
-2) Image acquisition: Images may be digitized with a flatbed scanner or camera, although ideally a set of images should all be digitized in a similar way with the same device.
+2. **Image acquisition:** Images may be digitized with a flatbed scanner or camera, although ideally a set of images should all be digitized in a similar way with the same device.
 
-3) Background removal: The image background (including dust, debris, and extra scales) should be selected and removed in Photo Editing software, such as [Gimp](https://www.gimp.org/), and replaced by a solid black or white background. If wings in several images are to be compared, it is highly recommended that all images have a matching background (either all black or all white).
+3. **Background removal:** The image background (including dust, debris, and extra scales) should be selected and removed in Photo Editing software, such as [Gimp](https://www.gimp.org/), and replaced by a solid black or white background. If wings in several images are to be compared, it is highly recommended that all images have a matching background (either all black or all white).
 
-4) Image size: For sampling, large images are automatically reduced in size to have a maximum dimension (height or width) of 1000px. Images may be larger or smaller than this, but images in a set should ideally be similar to one another in size.
+4. **Image size:** For sampling, large images are automatically reduced in size to have a maximum dimension (height or width) of 1000px. Images may be larger or smaller than this, but images in a set should ideally be similar to one another in size.
 
-5) File format: It is recommended that images are saved in an uncompressed format, like PNG or TIFF. JPEG and other compressed formats should work too, but the artifacts of image compression may affect the analysis.
+5. **File format:** It is recommended that images are saved in an uncompressed format, like PNG or TIFF. JPEG and other compressed formats should work too, but the artifacts of image compression may affect the analysis.
 
 
 # Usage
