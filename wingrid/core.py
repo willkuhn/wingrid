@@ -1192,7 +1192,8 @@ class Analyze():
 
         # PRE-PLOT
         classes = np.unique(labels)
-        class_colors = plt.cm.hsv(np.linspace(0,1,len(classes)))
+        class_colors = plt.cm.hsv(np.linspace(0.,0.75,len(classes)))
+        
         colors = [(  0,  0,  0), # class labels color: solid black
                   ( 89, 89, 89), # indiv labels color: 35% gray
                   ]
