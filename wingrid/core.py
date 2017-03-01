@@ -1317,7 +1317,7 @@ class Analyze():
             plot_title = 'LD{} & {}'.format(comps[0],comps[1])
         if title is not None:
             plot_title += (' - '+title)
-        plt.title(plot_title,fontsize=16,weight='bold')
+        plt.title(plot_title,fontsize=14)
 
         # adjust plot padding
         plt.subplots_adjust(bottom=0.06,
@@ -1376,54 +1376,65 @@ class Analyze():
         var = explained_variance_ratio[comp-1]
 
         # Set up plot and subplots
-        fig,ax = plt.subplots(nrows=1,ncols=1,facecolor='w',figsize=(3,12))
+        fig,ax = plt.subplots(nrows=1,ncols=1,facecolor='w',figsize=(15,3))
 
-        # Plot loadings for each PC as a separate bar plot:
-        ax.barh(bottom=range(len(loadings[0])), # y-value for each bar
-                width=loadings[comp-1],        # length of each bar
-                height=0.6,                  # how wide to make each bar
-                color='k',
-                linewidth=0)
+        # Add horizontal grid
+        ax.grid(color='k',
+                alpha=0.3,
+                which='major',
+                axis='y',
+                linewidth=0.5,
+                linestyle='solid')
+
+        # Plot loadings (Axes.vlines() looks nicer than Axes.bar())
+        ax.vlines(x=range(len(loadings[0])), # x-value for each line
+                  ymin=0,
+                  ymax=loadings[comp-1],        # length of each line
+                  linestyles='solid',
+                  color='k',
+                  linewidths=1.2)
 
         # Set axis limits
-        xmin = loadings[comp-1].min()-0.1*loadings[comp-1].std()
-        xmax = loadings[comp-1].max()+0.1*loadings[comp-1].std()
-        ax.set_xlim(xmin,xmax)
-        ax.set_ylim(-2,loadings.shape[1]+2) # add a little space above 1st bar and below last bar
+        ymin = loadings[comp-1].min()-0.1*loadings[comp-1].std()
+        ymax = loadings[comp-1].max()+0.1*loadings[comp-1].std()
+        ax.set_xlim(-2,loadings.shape[1]+1) # add a little space above 1st bar and below last bar
+        ax.set_ylim(ymin,ymax)
 
-        # Label x-axis
+        # Label y-axis
         if method=='pca':
-            ax.set_xlabel('Loadings on\nPC{} ({:.2f}% of total var)'.format(comp,var*100))
+            ax.set_ylabel('Loadings on PC{}\n({:.2f}% of total var)'.format(comp,var*100))
         elif method=='lda':
-            ax.set_xlabel('Loadings on\nLD{} ({:.2f}% of total var)'.format(comp,var*100))
+            ax.set_ylabel('Loadings on LD{}\n({:.2f}% of total var)'.format(comp,var*100))
 
-        # rotate the x-axis labels by 45 deg so they don't overlap
-        plt.setp(ax.xaxis.get_majorticklabels(),rotation=45)
+        # rotate the x-axis labels to vertical so they don't overlap
+        plt.setp(ax.xaxis.get_majorticklabels(),rotation='vertical')
 
-        # Label the y-ticks using the f_labels:
-        ax.set_yticks(np.arange(len(loadings[0])))
-        ax.set_yticklabels(f_labels)
+        # Label the x-ticks using the f_labels:
+        ax.set_xticks(np.arange(len(loadings[0])))
+        ax.set_xticklabels(f_labels)
 
-        # Adjust both axes:
-        ax.tick_params(axis='both',
-                       length=0, # removes tick marks from plot
-                       labelsize=6 # sets fontsize for x- and y-labels
+        # adjust x-axis               
+        ax.tick_params(axis='x',
+                       labelsize=10, # sets fontsize for x- and y-labels
+                       length=0 # effectively removes x-tick marks from plot
                        )
 
         # Change color of the background outside plot to white
         ax.set_axis_bgcolor('white')
 
         # adjust plot padding
-        plt.subplots_adjust(bottom=0.06,
-                            #left=  0.06,
-                            #right= 0.96,
-                            top=   0.96
+        plt.subplots_adjust(bottom=0.25,
+                            left=  0.09,
+                            right= 0.97,
+                            top=   0.99
                             )
 
         plt.show()
 
+        # TODO: This plot looks cramped when there are more than ~100 features
+        # Perhaps only label the top-contributing features when n_features>100
 
-    def loadings_plot_2d(self,grid,comps=[1,2],n_highest=10):
+    def loadings_plot_2d(self,grid,comps=[1,2],n_highest=10,title=None):
         """Scatterplot that shows, in 2 dimensions, the contribution that
         each feature makes toward the selected components. Thus, points that
         are relatively far away from the origin represent high contributing-
@@ -1451,6 +1462,9 @@ class Analyze():
             Number of highest-contributing features to highlight in the plot.
             If `f_mask` was provided, must be between 1 and n_features_masked,
             otherwise must be between 1 and n_features.
+
+        title : str or None (default), optional
+            A string that will be added to the end of the plot's title.
         """
 
         # Check that a model has been fitted already
@@ -1554,12 +1568,12 @@ class Analyze():
 
         # Label x-axis
         if method=='pca':
-            ax.set_xlabel('Loadings on PC{} ({:.2f}% of total var)'.format(comps[0],var[0]*100))
-            ax.set_ylabel('Loadings on PC{} ({:.2f}% of total var)'.format(comps[1],var[1]*100))
+            ax.set_xlabel('PC{} ({:.2f}% of total var)'.format(comps[0],var[0]*100))
+            ax.set_ylabel('PC{} ({:.2f}% of total var)'.format(comps[1],var[1]*100))
 
         elif method=='lda':
-            ax.set_xlabel('Loadings on LD{} ({:.2f}% of total var)'.format(comps[0],var[0]*100))
-            ax.set_ylabel('Loadings on LD{} ({:.2f}% of total var)'.format(comps[1],var[1]*100))
+            ax.set_xlabel('LD{} ({:.2f}% of total var)'.format(comps[0],var[0]*100))
+            ax.set_ylabel('LD{} ({:.2f}% of total var)'.format(comps[1],var[1]*100))
 
         # rotate the x-axis labels by 45 deg so they don't overlap
         plt.setp(ax.xaxis.get_majorticklabels(),rotation=45)
@@ -1571,7 +1585,14 @@ class Analyze():
         # Change color of the background outside plot to white
         ax.set_axis_bgcolor('white')
 
-        # TODO: add colorbar (use code from `loadings_image_overlay`)
+        # Title the plot
+        if method=='pca':
+            plot_title = 'Loadings on PC{} & {}'.format(comps[0],comps[1])
+        elif method=='lda':
+            plot_title = 'Loadings on LD{} & {}'.format(comps[0],comps[1])
+        if title is not None:
+            plot_title += (' - '+title)
+        plt.title(plot_title,fontsize=14)
 
         # adjust plot padding
         plt.subplots_adjust(bottom=0.08,
@@ -1581,6 +1602,7 @@ class Analyze():
                             )
 
         plt.show()
+        # TODO: add colorbar (use code from `loadings_image_overlay`)
 
 
     def loadings_image_overlay(self,image,grid,comps=[1],show_cell_nums=False,
@@ -1846,41 +1868,41 @@ class Analyze():
         # Title the plot
         if self.method_=='pca':
             if comps=='all':
-                plot_title = 'Relative contrib. of features on all PCs'.format(comps)
+                plot_title = "Loadings on all PCs".format(comps)
             elif len(comps)==1:
-                plot_title = 'Relative contrib. of features on PC{}'.format(comps)
+                plot_title = "Loadings on PC {}".format(comps)
             else:
-                plot_title = 'Relative contrib. of features on PCs {}'.format(comps)
+                plot_title = "Loadings on PCs {}".format(comps)
         elif self.method_=='lda':
             if comps=='all':
-                plot_title = 'Relative contrib. of features on all LDs'.format(comps)
+                plot_title = "Loadings on all LDs".format(comps)
             elif len(comps)==1:
-                plot_title = 'Relative contrib. of features on LD{}'.format(comps)
+                plot_title = "Loadings on LD {}".format(comps)
             else:
-                plot_title = 'Relative contrib. of features on LDs {}'.format(comps)
+                plot_title = "Loadings on LDs {}".format(comps)
 
         if title is not None:
             plot_title += (' - '+title)
 
-        fig.suptitle(plot_title,fontsize=16,weight='bold')
+        fig.suptitle(plot_title,fontsize=14)
 
         # Label rows and columns with channel and statistic
         for st,row in enumerate(axes):   # rows: [mean,std]
             for channel,ax in zip(['red','green','blue'],row): # cols: [r,g,b]
-                if st==0:
-                    ax.text(3,1,channel,color=channel,fontsize=14,weight='bold',ha='left')
-                if channel=='red':
+                if st==1: # bottom row
+                    ax.set_xlabel(channel+' channel',color=channel,fontsize=12)
+                if channel=='red': # first column
                     if st==0:
-                        ax.text(-25,2,'mean',rotation='vertical',fontsize=14,weight='bold',ha='right')
+                        ax.set_ylabel("mean px. value",fontsize=12)                    
                     elif st==1:
-                        ax.text(-25,2,'stdev',rotation='vertical',fontsize=14,weight='bold',ha='right')
+                        ax.set_ylabel("stdev of px. values",fontsize=12)                        
 
         # adjust plot padding and spacing between plots
         plt.subplots_adjust(hspace=0.001,
                             wspace=0.001,
                             # padding on sides
-                            bottom=0.02,
-                            left=0.03,
+                            bottom=0.04,
+                            left=0.04,
                             right=0.97,
                             top=0.95,
                             )

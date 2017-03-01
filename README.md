@@ -371,8 +371,9 @@ Structural:
 - [ ] add an overarching class that manages sampling multiple images and analysis of these data
 
 Visual:
-- [ ] fix y-axis labeling in `Analyze.loadings_plot_bar`, and possibly make the plot horizontal instead of vertical
-- [ ] find a better color for grid cell numbers in grid-plotting functions
+- [ ] change the way x-axis labels are displayed in `Analyze.loadings_plot_bar` to make them less cramped when n_features>100
+- [ ] add colorbar to `Analyze.loadings_plot_2d`
+- [ ] choose a better color for grid cell numbers in grid-plotting functions
 - [ ] in grid-plotting functions, reduce text size when plotting grid cell numbers on small cells (so numbers don't overlap)
 - [ ] add option in plotting functions to save directly to a provided filepath
 - [ ] add option for customizing coloring of plot elements
