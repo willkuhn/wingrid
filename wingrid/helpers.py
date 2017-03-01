@@ -5,7 +5,7 @@ Wingrid Insect Wing Color Analysis Package
 
 # Author: William R. Kuhn
 
-# License: MIT License
+# License: GNU GPL License v3
 
 import cv2 # MUST BE version 3.0 or higher
 import numpy as np
