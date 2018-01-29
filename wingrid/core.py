@@ -307,7 +307,7 @@ class Grid():
         # C: remaining vertex
         c = list({0,1,2} - {a,b})[0]
 
-        A,B,C = [tri[i] for i in a,b,c]
+        A,B,C = [tri[i] for i in [a,b,c]]
         tri_new = np.array((A,B,C))
 
         self.tri_ = tri_new
@@ -398,8 +398,8 @@ class Grid():
             bbD = max(corner_LL[1], corner_LR[1])
 
         # List the coordinates of every `step` pixel in the cell's bounding box
-        coords = np.array([(x,y) for y in xrange(bbU,bbD,step) \
-                           for x in xrange(bbL,bbR,step)])
+        coords = np.array([(x,y) for y in range(bbU,bbD,step) \
+                           for x in range(bbL,bbR,step)])
 
         # Convert those (x,y) pixel coordinates to (r,theta) polar coords
         coords_pol = np.array(map(lambda i: cart2polar(*i,originXY=A),
@@ -535,8 +535,8 @@ class Grid():
         thetas      = self.thetas_
 
         # Get row,col indices for all cells in the grid
-        cells = [(row,col) for row in xrange(n_grid_rows) \
-                 for col in xrange(n_grid_cols)]
+        cells = [(row,col) for row in range(n_grid_rows) \
+                 for col in range(n_grid_cols)]
 
         # Find the px coordinates in each cell
         coords = [self._get_px_coords_for_cell(r,c,tri,radii,thetas,
@@ -720,8 +720,8 @@ class Grid():
             n_grid_cols = self.n_grid_cols
 
             # Get channel,statistic,row,col indices for all cells in the grid
-            cells = [(ch,st,row,col) for ch in xrange(3) for st in xrange(2)\
-            for row in xrange(n_grid_rows) for col in xrange(n_grid_cols)]
+            cells = [(ch,st,row,col) for ch in range(3) for st in range(2)\
+            for row in range(n_grid_rows) for col in range(n_grid_cols)]
 
             # Get indices of non-contributing cells ('edge cells')
             cells_noncontrib = np.array(cells)[~f_mask]
@@ -1109,40 +1109,39 @@ class Analyze():
         return hc
 
 
-    def plot_comps(self,labels,comps=[1,2],filter_by=None,label_classes=True,
-                   indiv_labels=None,title=None,center_at_origin=True):
+    def plot_comps(self,labels,comps=[1,2],filter_by=None,color_by=None,
+                   label_classes=True,indiv_labels=None,title=None,
+                   center_at_origin=True):
         """Draw a 2D scatterplot of transformed data.
 
         Parameters
         ----------
-        comps : list of ints, optional (default [1,2])
-            PCs or LDs to plot. [1,2] means the first two PCs or LDs.
+        labels : list-like of shape (n_samples,)
+            Labels used to determine classes. Points for a class
+            are connected by lines extending from the class' centroid.
+        comps : list of 2 ints, optional (default [1,2])
+            Which two PCs or LDs to plot. [1,2] means the first two PCs or LDs.
             Values must be between 1 and n_components.
-
-        labels : array or list, shape (n_samples,)
-            Target values used to determine classes. Points for a class
-            are connected by lines from the class' centroid
-            (average coordinates).
-
-        filter_by : array or list, shape (n_samples,), optional
+        filter_by : list-like of shape (n_samples,), optional
             A Boolean list used to filter the plot to a subset of the samples
             for which `filter_by`==True. Default is None (no filtering).
-
+            This is helpful for highlighting a subset of the data, while
+            holding the plot limits constant.
+        color_by : list-like of shape (n_samples,), optional
+            Alternative grouping variable for coloring individual points.
+            If not provided, indivuals are colored by class (as determined
+            using `labels`)
         label_classes : bool, optional (default True)
-            Whether to label classes. Class labels are placed at each
-            class' centroid.
-
-        indiv_labels : None (default) or array shape (n_samples,), optional
-            List of labels for individuals (such as filenames or sample
-            numbers). Labels are placed alongside each individual's coordinate.
-            If provided, must be of length n_samples even if `filter_by` is also
-            provided. If None, individuals are not labeled.
-
-        title : str or None (default), optional
-            A string that's added to the end of the plot's title.
-
+            If True, class labels are placed at each class' centroid.
+        indiv_labels : list-like of shape (n_samples,), optional
+            List of labels for individuals (e.g., filenames or sample codes).
+            Labels are placed alongside each individual's coordinate.
+            If provided, must be of length n_samples even if `filter_by` is
+            also provided. If None, individuals are not labeled.
+        title : str (default None), optional
+            A string to be added to the end of the plot's title.
         center_at_origin : bool (default True), optional
-            When True, plot is centered at (0,0); otherwise, it's centered at
+            If True, plot is centered at (0,0); otherwise, it's centered at
             the centroid of the data. Centering at the origin looks nice, but
             is not alway convenient, particularly when `filter_by` is used.
         """
@@ -1174,6 +1173,12 @@ class Analyze():
             if not len(indiv_labels)==len(X):
                 raise ValueError("`indiv_labels` must be of length n_samples.")
 
+        # Check `color_by`
+        if color_by is not None: # if individual labels are provided
+            # Check length of color_by
+            if not len(color_by)==len(X):
+                raise ValueError("`color_by` must be of length n_samples.")
+
         # Check & apply `filter_by`
         if filter_by is not None:
             filter_by = np.array(filter_by) # Make sure its an array
@@ -1191,15 +1196,23 @@ class Analyze():
 
 
         # PRE-PLOT
-        classes = np.unique(labels)
-        class_colors = plt.cm.hsv(np.linspace(0.,0.75,len(classes)))
+        classes = np.unique(labels) # get classes for connecting indivs
+        if color_by is not None:
+            # Get iterator list specifying color for each indiv
+            groups = np.unique(color_by)
+            group_colors = plt.cm.hsv(np.linspace(0.,0.75,len(groups)))
+            gc_dict = dict(zip(groups,group_colors))
+            group_colors_list = np.array([gc_dict[g] for g in color_by])
+        else:
+            # Get list for coloring by class
+            class_colors = plt.cm.hsv(np.linspace(0.,0.75,len(classes)))
 
-        colors = [(  0,  0,  0), # class labels color: solid black
-                  ( 89, 89, 89), # indiv labels color: 35% gray
-                  ]
+        plot_colors = [(  0,  0,  0), # class labels color: solid black
+                       ( 89, 89, 89), # indiv labels color: 35% gray
+                       ]
 
         # Rescale values to between 0 and 1
-        colors = [(r/255.,g/255.,b/255.) for r,g,b in colors]
+        plot_colors = [(r/255.,g/255.,b/255.) for r,g,b in plot_colors]
 
         # Get axes limits
         if center_at_origin:
@@ -1207,7 +1220,7 @@ class Analyze():
             mmax = np.abs(X[:,[comps[0]-1,comps[1]-1]]).max() + buf
             xmax = ymax = mmax
             xmin = ymin = -mmax
-        elif not center_at_origin:
+        elif not center_at_origin: # TODO: 'off' doesn't seem to work here
             center = X.mean(axis=0) # find centroid
             resid = X - center # center data at centroid
             buf = 0.2*np.abs(resid[:,[comps[0]-1,comps[1]-1]]).std()
@@ -1217,7 +1230,7 @@ class Analyze():
             xmin = -mmax + center[0]
             ymin = -mmax + center[1]
         else:
-            raise ValueError('`center_at_origin` must be True or False.')
+            raise ValueError('`center_at_origin` must be Boolean.')
 
 
         # PLOT
@@ -1233,49 +1246,39 @@ class Analyze():
                   linestyle='solid',
                   alpha=0.4)
 
-        for cl,color in zip(classes,class_colors): #For each class
-            points = np.atleast_2d(X[labels==cl])
-            points = points[:,[comps[0]-1,comps[1]-1]]
+        # Main plotting loop:
+        if color_by is not None: # If color_by is provided:
+            for cl in classes: #For each class
+                points = np.atleast_2d(X[labels==cl])
+                points = points[:,[comps[0]-1,comps[1]-1]]
+                colors = np.atleast_2d(group_colors_list[labels==cl])
 
-            # Calculate centroid
-            mx,my = points.mean(axis=0)
+                # Calculate centroid
+                mx,my = points.mean(axis=0)
 
-            # Plot centroid
-            ax.plot(mx,my,'+',
-                    alpha=0.5,
-                    ms=10,
-                    color=color,
-                    markeredgewidth=1)
+                # Plot centroid (gray)
+                ax.plot(mx,my,'+',
+                        alpha=0.5,
+                        ms=10,
+                        color='k',
+                        markeredgewidth=1)
 
-            # Draw lines from all points to centroid
-            for x,y in points: #For each indiv with `bn`
-                ax.plot((x,mx),(y,my),
-                        linestyle='solid',
-                        color=color,
-                        alpha=0.3)
+                # Draw lines from all points to centroid (gray)
+                for x,y in points: #For each indiv with `bn`
+                    ax.plot((x,mx),(y,my),
+                            linestyle='solid',
+                            color='k',
+                            alpha=0.3)
 
-            # Plot all points
-            plt.plot(*points.T,
-                     marker='.',
-                     linestyle='None',
-                     color=color,
-                     markersize=20,
-                     alpha=0.5)
+                # Plot all points (lookup colors from group_colors_list)
+                plt.scatter(points.T[0],points.T[1],
+                         marker='o',
+                         c=colors,
+                         linewidths=0,
+                         s=100,
+                         alpha=0.5)
 
-        # Label individuals
-        if indiv_labels is not None: # if individual labels are provided
-
-            for (x,y),il in zip(X[:,[comps[0]-1,comps[1]-1]],indiv_labels):
-                ax.text(x+0.15*buf,y-0.15*buf, # offset coordinates by 1%
-                        il,
-                        color=colors[1],
-                        fontsize=10,
-                        ha='left',
-                        va='top')
-
-        # Label classes at their centroids
-        # This is separate & below individual labels so that class labels are on top
-        if label_classes:
+        else: # If color_by is not provided:
             for cl,color in zip(classes,class_colors): #For each class
                 points = np.atleast_2d(X[labels==cl])
                 points = points[:,[comps[0]-1,comps[1]-1]]
@@ -1283,10 +1286,53 @@ class Analyze():
                 # Calculate centroid
                 mx,my = points.mean(axis=0)
 
+                # Plot centroid
+                ax.plot(mx,my,'+',
+                        alpha=0.5,
+                        ms=10,
+                        color=color,
+                        markeredgewidth=1)
+
+                # Draw lines from all points to centroid
+                for x,y in points: #For each indiv with `bn`
+                    ax.plot((x,mx),(y,my),
+                            linestyle='solid',
+                            color=color,
+                            alpha=0.3)
+
+                # Plot all points
+                plt.scatter(points.T[0],points.T[1],
+                         marker='o',
+                         c=color,
+                         linewidths=0,
+                         s=100,
+                         alpha=0.5)
+
+        # Label individuals
+        if indiv_labels is not None: # if individual labels are provided
+
+            for (x,y),il in zip(X[:,[comps[0]-1,comps[1]-1]],indiv_labels):
+                ax.text(x+0.15*buf,y-0.15*buf, # offset coordinates by 15%
+                        il,
+                        color=plot_colors[1],
+                        fontsize=10,
+                        ha='left',
+                        va='top')
+
+        # Label classes at their centroids
+        # This is separate & below individual labels so that class labels are on top
+        if label_classes:
+            for cl in classes: #For each class
+                points = np.atleast_2d(X[labels==cl])
+                points = points[:,[comps[0]-1,comps[1]-1]]
+
+                # Calculate centroid
+                mx,my = points.mean(axis=0)
+
                 # Label centroid with class label
-                ax.text(mx+0.1*buf,my+0.1*buf, # offset coordinates by 1%
+                ax.text(mx+0.1*buf,my+0.1*buf, # offset coordinates by 10%
                         cl,
-                        color=colors[0],
+                        color=plot_colors[0],
                         fontsize=14,
                         ha='left',
                         va='bottom')
@@ -1304,7 +1350,7 @@ class Analyze():
         ax.set_ylim(ymin,ymax)
 
         # Change color of the background outside plot to white
-        ax.set_axis_bgcolor('white')
+        ax.set_facecolor('white')
 
         # Label axes
         plt.xlabel(xlabel,fontsize=12)
@@ -1413,7 +1459,7 @@ class Analyze():
         ax.set_xticks(np.arange(len(loadings[0])))
         ax.set_xticklabels(f_labels)
 
-        # adjust x-axis               
+        # adjust x-axis
         ax.tick_params(axis='x',
                        labelsize=10, # sets fontsize for x- and y-labels
                        length=0 # effectively removes x-tick marks from plot
@@ -1693,8 +1739,8 @@ class Analyze():
                             (loading_dists.max()-loading_dists.min()) # unsorted
 
         # Get channel,statistic,row,col indices for all cells in the grid
-        cells = [(ch,st,row,col) for ch in xrange(3) for st in xrange(2)\
-        for row in xrange(n_grid_rows) for col in xrange(n_grid_cols)]
+        cells = [(ch,st,row,col) for ch in range(3) for st in range(2)\
+        for row in range(n_grid_rows) for col in range(n_grid_cols)]
 
         if self.f_mask is not None:
             # Get indices of contributing cells
@@ -1893,9 +1939,9 @@ class Analyze():
                     ax.set_xlabel(channel+' channel',color=channel,fontsize=12)
                 if channel=='red': # first column
                     if st==0:
-                        ax.set_ylabel("mean px. value",fontsize=12)                    
+                        ax.set_ylabel("mean px. value",fontsize=12)
                     elif st==1:
-                        ax.set_ylabel("stdev of px. values",fontsize=12)                        
+                        ax.set_ylabel("stdev of px. values",fontsize=12)
 
         # adjust plot padding and spacing between plots
         plt.subplots_adjust(hspace=0.001,

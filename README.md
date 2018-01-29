@@ -157,6 +157,7 @@ array([False, False, False, False, False, False,  True,  True,  True,
 ```python
 >>> import pandas as pd # for managing data
 >>> import time # for timing
+>>> from _future_ import print_function # in case using Python 2.7
 
 # Read a table
 >>> md = pd.read_csv(os.path.join('images','metadata.csv'),header=0) # read a table
@@ -176,8 +177,8 @@ array([False, False, False, False, False, False,  True,  True,  True,
 >>>     t1 = time.clock()
 >>>     features.loc[fn] = f
 >>>     f_mask.loc[fn] = fm
->>>     print 'Finished {} in {:.3f}s'.format(fn,t1-t0)
->>> print features.shape, f_mask.shape
+>>>     print('Finished {} in {:.3f}s'.format(fn,t1-t0))
+>>> print(features.shape, f_mask.shape)
 (15, 720) (15, 720)
 ```
 This produces 2 Pandas DataFrames: `features`, which holds the color features sampled from the images, and `f_mask`, which holds the feature masks from the fitted grids. The 12x10 grid produces 720 features (12 grid rows x 10 grid columns x 2 statistics (mean & standard deviation) x 3 color channels).
@@ -244,7 +245,7 @@ In a nutshell, the PCA simply rotates our cloud of multi-dimensional observation
 >>> indiv_labels = np.array(range(len(labels)),dtype=str)
 # Get transformed data
 >>> features_transformed = an.features_transformed_
->>> print features_transformed.shape
+>>> print(features_transformed.shape)
 (15, 7)
 ```
 
@@ -263,8 +264,8 @@ Loadings are a measure of the importance of each feature to particular component
 
 **Get indices and labels for the 5 features that contribute most to LD1:**
 ```python
->>> print an.loadings_top_contrib(comps=[1],n_highest=5,grid=None)
->>> print an.loadings_top_contrib(comps=[1],n_highest=5,grid=g)
+>>> print(an.loadings_top_contrib(comps=[1],n_highest=5,grid=None))
+>>> print(an.loadings_top_contrib(comps=[1],n_highest=5,grid=g))
 [ 78 135 120  84 121]
 ['gm22' 'gs82' 'gs32' 'gm32' 'gs33']
 ```
