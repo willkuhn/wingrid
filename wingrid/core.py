@@ -540,7 +540,7 @@ class Grid():
 
         # Find the px coordinates in each cell
         coords = [self._get_px_coords_for_cell(r,c,tri,radii,thetas,
-                  step=2) for r,c in cells]
+                  step=2) for (r,c) in cells]
 
         self.cell_px_coords_ = coords
 
