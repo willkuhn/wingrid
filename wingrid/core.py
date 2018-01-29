@@ -7,7 +7,7 @@ Wingrid Insect Wing Color Analysis Package
 
 # License: GNU GPL License v3
 
-from .helpers import *
+from .helpers import downscaleIf,slope,polar2cart,cart2polar,RGB2chrom
 
 import cv2 # MUST BE version 3.0 or higher
 import numpy as np
@@ -402,8 +402,8 @@ class Grid():
                            for x in range(bbL,bbR,step)])
 
         # Convert those (x,y) pixel coordinates to (r,theta) polar coords
-        coords_pol = np.array(map(lambda i: cart2polar(*i,originXY=A),
-                              coords))
+        coords_pol = np.array(list(map(lambda i: cart2polar(*i,originXY=A),
+                              coords)))
 
         # Find pixel coordinates within grid cell
         rWise =     np.bitwise_and(rL<=coords_pol[:,0],
@@ -496,7 +496,7 @@ class Grid():
 
                 # extract pixel values while also checking that each pixel is
                 # within the image and within the image mask
-                vals = np.array(map(extract,cell))
+                vals = np.array(list(map(extract,cell)))
 
                 # drop any nans
                 vals_no_nan = vals[~np.isnan(vals)]
@@ -649,7 +649,8 @@ class Grid():
 
 
     def plot_grid(self,image=None,show_gridlines=True,show_cell_nums=True,
-                  show_tri=True,show_edge_cells=True,use_chrom=False):
+                  show_tri=True,show_edge_cells=True,use_chrom=False,
+                  filepath=None):
         """Vizualize a fitted and sampled grid.
 
         Raises RuntimeError if grid has not been fitted and sampled.
@@ -675,6 +676,9 @@ class Grid():
         use_chrom : bool, optional (default False)
             If an image is provided, whether to convert it to chromatic
             coordinates before plotting it.
+        filepath : string (default None)
+            Optional filepath to save figure directly to file. A path ending in
+            `.png` is recommended, e.g. `path/to/file.png`
         """
         if not hasattr(self,'f_mask_'):
             raise RuntimeError('Grid has not yet been fit to an image. Try'
@@ -736,9 +740,9 @@ class Grid():
 
         # Change color of figure background to match image background
         if background=='white':
-            ax.set_axis_bgcolor('white')
+            ax.set_facecolor('white')
         elif background=='black':
-            ax.set_axis_bgcolor('black')
+            ax.set_facecolor('black')
 
         # Plot edge cells
         if show_edge_cells:
@@ -801,7 +805,7 @@ class Grid():
         # Annotate cells with their cell number
         if show_cell_nums:
             # Get centroids of each cell
-            cell_centers = map(lambda c: np.mean(c,axis=0), coords)
+            cell_centers = list(map(lambda c: np.mean(c,axis=0), coords))
 
             for i,(x,y) in enumerate(cell_centers):
                 ax.text(x,y,str(i),
@@ -836,8 +840,13 @@ class Grid():
                             top=   0.96
                             )
 
-        plt.show()
-
+        if filepath is None:
+            plt.show()
+        elif type(filepath) is str:
+            plt.savefig(filepath,dpi=95,
+                        bbox_inches='tight',transparent=True,pad_inches=0)
+        else:
+            raise ValueError('Filepath should be a str path to file, like `path/to/file.png`')
         # TODO: Add option to write figure to file.
         # TODO: Add option to manually provide alternative colors for items.
 
@@ -1466,7 +1475,7 @@ class Analyze():
                        )
 
         # Change color of the background outside plot to white
-        ax.set_axis_bgcolor('white')
+        ax.set_facecolor('white')
 
         # adjust plot padding
         plt.subplots_adjust(bottom=0.25,
@@ -1629,7 +1638,7 @@ class Analyze():
         ax.set_ylim(-mmax,mmax)
 
         # Change color of the background outside plot to white
-        ax.set_axis_bgcolor('white')
+        ax.set_facecolor('white')
 
         # Title the plot
         if method=='pca':
@@ -1798,9 +1807,9 @@ class Analyze():
 
                 # Change color of figure background to match image background
                 if background=='white':
-                    ax.set_axis_bgcolor('white')
+                    ax.set_facecolor('white')
                 elif background=='black':
-                    ax.set_axis_bgcolor('black')
+                    ax.set_facecolor('black')
 
         # Color cells by contribution
         for st,row in enumerate(axes):   # rows: [mean,std]
@@ -1874,7 +1883,7 @@ class Analyze():
             # Annotate cells with their cell number
             if show_cell_nums:
                 # Get centroids of each cell
-                cell_centers = map(lambda c: np.mean(c,axis=0), coords)
+                cell_centers = list(map(lambda c: np.mean(c,axis=0), coords))
 
                 # Contrast with image background
                 if background=='white':
